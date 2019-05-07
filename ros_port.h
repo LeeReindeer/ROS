@@ -4,6 +4,7 @@
 /**
  * include with avr-libc for uintX_t and bool
  */
+#include <avr/interrupt.h>
 #include <stdbool.h>
 #include <stdint.h>
 /**
@@ -17,7 +18,16 @@
   cli();
 #define CRITICAL_END() SREG = sre;
 
-#define F_CPU 16000000
-// #define
+#ifndef F_CPU
+// Atmega328p CPU frequency is 16MHZ
+#define F_CPU 16000000UL
+#endif
+
+// System ticks pre-second, 100 means 1/100s(10ms) one tick
+#define ROS_SYS_TICK 100
+
+#define ROS_IDLE_STACK_SIZE 64
+
+#define MAX_TASK_SIZE 5
 
 #endif  //__ROS_PORT_H__
