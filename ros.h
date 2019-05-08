@@ -67,6 +67,7 @@ typedef uint8_t status_t;
 
 // init the os, add a idle task into the list, init the system timer tick
 bool ros_init();
+ROS_TCB *ros_current_tcb();
 // create a task, valid it then add it to the ready list
 status_t ros_create_task(task_func task, uint8_t priority, void *stack_top);
 // select the max priority task in the ready list, then swap in it and swap out
@@ -86,7 +87,7 @@ extern ROS_TCB *tcb_ready_list;
 // define in ros_port.c for porting
 extern void ros_init_timer();
 extern void ros_idle_task();
-extern void ros_task_context_init(ROS_TCB tcb_ptr, task_func task_f,
+extern void ros_task_context_init(ROS_TCB *tcb_ptr, task_func task_f,
                                   void *stack_top);
 extern void ros_switch_context();
 

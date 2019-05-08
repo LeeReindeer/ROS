@@ -28,6 +28,14 @@ bool ros_init() {
   return ROS_STARTED;
 }
 
+/**
+ * @retval current tcb if NOT in interrupt service routine
+ */
+ROS_TCB *ros_current_tcb() {
+  if (ros_int_cnt == 0) return current_tcb;
+  return NULL;
+}
+
 // create a task, valid it then add it to the ready list
 status_t ros_create_task(task_func task_f, uint8_t priority, void *stack_top) {
   CRITICAL_STORE;
@@ -39,6 +47,7 @@ status_t ros_create_task(task_func task_f, uint8_t priority, void *stack_top) {
   tcb->priority = priority;
   tcb->next_tcb = NULL;
   tcb->status = TASK_READY;
+  tcb->task_entry = task_f;
 
   // Initial task context(pc, called-registers, SREG), and set current stack
   // pointer to tcb
