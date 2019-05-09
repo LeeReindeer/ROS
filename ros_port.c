@@ -74,7 +74,7 @@ void ros_task_context_init(ROS_TCB *tcb_ptr, task_func task_f,
   *stack_top-- = 0x00; // R17
   *stack_top-- = 0x00; // R28
   *stack_top-- = 0x00; // R29
-  save the SREG contents to save the interrupt flag
+  // save the SREG contents to save the interrupt flag
   // *stack_top-- = 0x80;  // sreg, enable interrupt
   tcb_ptr->sp = stack_top;
 }

@@ -74,10 +74,6 @@ status_t ros_create_task(ROS_TCB *tcb, task_func task_f, uint8_t priority,
   if (tcb == NULL || task_f == NULL || stack_top == NULL) {
     return ROS_ERR_PARAM;
   }
-  // if (next_tcb_id > MAX_TASK_SIZE) {
-  // return ROS_ERR_TASK_OF;
-  // }
-  // tcb = &TCBS[next_tcb_id++];
   tcb->priority = priority;
   tcb->next_tcb = NULL;
   tcb->status = TASK_READY;
@@ -89,7 +85,7 @@ status_t ros_create_task(ROS_TCB *tcb, task_func task_f, uint8_t priority,
 
   // critical block: disable interrupt
   CRITICAL_START();
-  // todo enqueue tcb
+  ros_tcb_enqueue(tcb);
   CRITICAL_END();
   if (ROS_STARTED && ros_current_tcb()) ros_schedule();
   return ROS_OK;
@@ -112,18 +108,21 @@ void ros_schedule() {
     ros_switch_context_shell(current_tcb, new_tcb);
   } else {
     // remove terminated task
-    // fixme what for suspended task?
+    // todo how about suspended task?
     do {
       new_tcb = ros_tcb_dequeue(current_tcb->priority);
     } while (new_tcb && new_tcb->status == TASK_TERMINATED);
     if (new_tcb) {
-      // new_tcb->status = TASK_RUNNING;
       ros_switch_context_shell(current_tcb, new_tcb);
     }
   }
   CRITICAL_END();
 }
 
+/**
+ * @brief enqueue tcb to list order by priority. Do round-robin when priority is same.
+ * @param  *tcb: the tcb to insert
+ */
 void ros_tcb_enqueue(ROS_TCB *tcb) {
   if (tcb == NULL) return;
   ROS_TCB *prev_ptr, *next_ptr;
@@ -150,6 +149,13 @@ void ros_tcb_enqueue(ROS_TCB *tcb) {
   } while (prev_ptr != NULL);
 }
 
+/**
+ * @brief  dequeue a tcb to swap in, requeir its priority no lower than lowest_priority
+ * Because the list ordered by priority, we just check the head, if the head is lower than lowest_priority,
+ * return NULL.
+ * use ros_tcb_dequeue(MIN_TASK_PRIORITY) to dequeue head unconditionally
+ * @param lowest_priority: the lowest priority of dequeue tcb or NULL if no such tcb
+ */
 void ros_tcb_dequeue(uint8_t lowest_priority) {
   if (tcb_ready_list == NULL || tcb_ready_list->priority > lowest_priority) {
     return NULL;
