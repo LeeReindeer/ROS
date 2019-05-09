@@ -1,12 +1,23 @@
 #ifndef __ROS_PORT_H__
 #define __ROS_PORT_H__
 
+#define ARDUINO 100  // todo remove, include arduino files when i'm coding...
+#if ARDUINO >= 100
+#include "Arduino.h"
+#else
+#include "WProgram.h"
+#endif  // ARDUINO
 /**
  * include with avr-libc for uintX_t and bool
  */
 #include <avr/interrupt.h>
 #include <stdbool.h>
 #include <stdint.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 /**
  * Because the interrupt flag is stored in SREG, so we save the old SREG, then
  * disable interrupt to do critical codes. After calling CRITICAL_END(), the
@@ -28,5 +39,9 @@
 
 #define ROS_IDLE_STACK_SIZE 64
 #define ROS_DEFAULT_STACK_SIZE 128
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif  //__ROS_PORT_H__

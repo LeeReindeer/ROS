@@ -1,16 +1,6 @@
 #ifndef __ROS_H__
 #define __ROS_H__
 
-#define ARDUINO 100  // include arduino files when i'm coding...
-// #define SUPPRESS  // for suppress error in vs code, undefine when compile
-#ifndef SUPPRESS
-#if ARDUINO >= 100
-#include "Arduino.h"
-#else
-#include "WProgram.h"
-#endif  // ARDUINO
-#endif  // SUPPRESS
-
 #include "ros.h"
 #include "ros_port.h"
 
@@ -98,4 +88,5 @@ extern void ros_switch_context(ROS_TCB *old_tcb, ROS_TCB *new_tcb);
 #ifdef __cplusplus
 }
 #endif
+
 #endif  //__ROS_H__
