@@ -62,8 +62,6 @@ typedef uint8_t status_t;
 #define ROS_OK 0U
 #define ROS_ERROR 1U
 #define ROS_ERR_PARAM 200U
-// task size > MAX_TASK_SIZE
-#define ROS_ERR_TASK_OF 201U
 
 /*OS core functions: scheduler, context init, context switch and system tick*/
 

@@ -3,8 +3,6 @@
 
 /*private fields and functions*/
 
-// +1 for idle task
-// static ROS_TCB TCBS[MAX_TASK_SIZE + 1];
 static uint8_t next_tcb_id = 0;
 
 static int ros_int_cnt = 0;
@@ -13,6 +11,23 @@ static ROS_TCB idle_tcb;
 static uint8_t idle_task_stack[ROS_IDLE_STACK_SIZE];
 // current running task
 static ROS_TCB *current_tcb = NULL;
+
+static ros_switch_context_shell(ROS_TCB *old_tcb, ROS_TCB *new_tcb);
+
+/**
+ * @brief  Warpper function of context switch. It will be called by schduler,set
+ * the current_tcb
+ * @param  *old_tcb: tcb need to swap out, it always pointer to current_tcb
+ * @param  *new_tcb: tcb need to swap in, current_tcb will be set to new_tcb
+ */
+static ros_switch_context_shell(ROS_TCB *old_tcb, ROS_TCB *new_tcb) {
+  // diable self-preemption
+  if (old_tcb != new_tcb) {
+    current_tcb = new_tcb;  // we don't need to update current_tcb in asm code
+    // the old_tcb is previous current_tcb
+    ros_switch_context(old_tcb, new_tcb);
+  }
+}
 
 bool ROS_STARTED = false;
 
@@ -94,7 +109,7 @@ void ros_schedule() {
       current_tcb->status == TASK_TERMINATED) {
     // task with any priority(0~255) can be swap in
     new_tcb = ros_tcb_dequeue(MIN_TASK_PRIORITY);
-    ros_switch_context(current_tcb, new_tcb);
+    ros_switch_context_shell(current_tcb, new_tcb);
   } else {
     // remove terminated task
     // fixme what for suspended task?
@@ -102,11 +117,8 @@ void ros_schedule() {
       new_tcb = ros_tcb_dequeue(current_tcb->priority);
     } while (new_tcb && new_tcb->status == TASK_TERMINATED);
     if (new_tcb) {
-      // diable self-preemption
-      if (current_tcb != new_tcb) {
-        // new_tcb->status = TASK_RUNNING;
-        ros_switch_context(current_tcb, new_tcb);
-      }
+      // new_tcb->status = TASK_RUNNING;
+      ros_switch_context_shell(current_tcb, new_tcb);
     }
   }
   CRITICAL_END();

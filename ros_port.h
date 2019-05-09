@@ -16,7 +16,7 @@
 #define CRITICAL_START() \
   sreg = SREG;           \
   cli();
-#define CRITICAL_END() SREG = sre;
+#define CRITICAL_END() SREG = sreg;
 
 #ifndef F_CPU
 // Atmega328p CPU frequency is 16MHZ
@@ -27,7 +27,6 @@
 #define ROS_SYS_TICK 100
 
 #define ROS_IDLE_STACK_SIZE 64
-
-#define MAX_TASK_SIZE 5
+#define ROS_DEFAULT_STACK_SIZE 128
 
 #endif  //__ROS_PORT_H__
