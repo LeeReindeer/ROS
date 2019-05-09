@@ -10,7 +10,7 @@ extern "C" {
 
 typedef enum {
   TASK_READY = 0,
-  TASK_RUNNING,
+  // TASK_RUNNING,
   TASK_BLOCKED,
   TASK_TERMINATED
 } Task_Status;
