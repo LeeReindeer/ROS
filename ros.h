@@ -52,16 +52,14 @@ typedef uint8_t status_t;
 #define ROS_OK 0U
 #define ROS_ERROR 1U
 #define ROS_ERR_PARAM 200U
+#define ROS_ERR_CONTEXT 201U
+#define ROS_ERR_TIMER 201U
 
 /*OS core functions: scheduler, context init, context switch and system tick*/
 
-// init the os, add a idle task into the list, init the system timer tick
 bool ros_init();
 ROS_TCB *ros_current_tcb();
-// create a task, valid it then add it to the ready list
 status_t ros_create_task((ROS_TCB *tcb, task_func task, uint8_t priority, void *stack_top);
-// select the max priority task in the ready list, then swap in it and swap out
-// current_tcb and set the current_tcb
 void ros_schedule();
 
 // list operations
@@ -70,8 +68,24 @@ void ros_tcb_dequeue(int lowest_priority);
 
 // call the following three functions from ISR
 void ros_int_enter();
-void ros_sys_tick();
+// define in ros_timer.c
+extern void ros_sys_tick();
 void ros_int_exit();
+
+/**
+ * Provide functions to schedule task periodly
+ * We just wrap the task_func with ros_delay() in following format:
+ * void task_wrapper() {
+ *  ros_delay(delay);
+ *  while (1) {
+ *    tcb->task_entry();
+ *    ros_delay(period); 
+ *  }
+ * }
+ * So your task function MUST be a run to compeletion task.
+ * //TODO but i do not know how to wrap
+ * /
+// status_t ros_create_period_task(ROS_TCB *tcb, task_func task, uint8_t priority, void *stack_top, uint32_t period, uint32_t delay);
 
 /* Global values and functions*/
 

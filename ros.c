@@ -13,6 +13,18 @@ static ROS_TCB *current_tcb = NULL;
 
 static ros_switch_context_shell(ROS_TCB *old_tcb, ROS_TCB *new_tcb);
 
+/*Global fields*/
+
+bool ROS_STARTED = false;
+
+/**
+ * The tcb list is a single linked list, and it's ordered by priority.
+ * The head of list always has the highest priority, there's already a idel task
+ * whil os started, so when schedule just take the head of list, but the enqueue
+ * operations take O(N) time complexity, the dequeue is O(1).
+ */
+ROS_TCB *tcb_ready_list = NULL;
+
 /**
  * @brief  Warpper function of context switch. It will be called by schduler,set
  * the current_tcb
@@ -30,16 +42,12 @@ static ros_switch_context_shell(ROS_TCB *old_tcb, ROS_TCB *new_tcb) {
   }
 }
 
-bool ROS_STARTED = false;
-
 /**
- * The tcb list is a single linked list, and it's ordered by priority.
- * The head of list always has the highest priority, there's already a idel task
- * whil os started, so when schedule just take the head of list, but the enqueue
- * and dequeue operations both take O(N) time complexity.
+ * @brief  Start the os:
+ * 1. init the system timer, start ticking
+ * 2. add a idle task into the list
+ * @retval ture if os started
  */
-ROS_TCB *tcb_ready_list = NULL;
-
 bool ros_init() {
   CRITICAL_STORE;
   CRITICAL_START();
@@ -92,8 +100,21 @@ status_t ros_create_task(ROS_TCB *tcb, task_func task_f, uint8_t priority,
   return ROS_OK;
 }
 
-// select the max priority task in the ready list, then swap in it and swap out
-// current_tcb and set the current_tcb
+/**
+ * OS core scheduler implementation.
+ * The scheduler will be called only in follwing 3 places:
+ * - timer ISR calls scheduler
+ * - task voluntarily ros_delay() to the scheduler
+ * - the task run to compeletion, delete this task, call the scheduler to pick
+ * the next task
+ *
+ * The schduler is preemptive priority-based with round-robin.The round-robin is
+ * only preformed for the task with same priority.We allow swap in the task,
+ * when its priority is NO LESS than current task.
+ *
+ * While scheduler is based on the list operations: enqueue and dequeue, so the
+ * scheduler tasks O(N) timer complexity.
+ */
 void ros_schedule() {
   // no schedule and context switch util the very end of ISR
   if (ros_int_cnt != 0 || !ROS_STARTED) return;
