@@ -6,7 +6,6 @@
 static uint8_t next_tcb_id = 0;
 
 static int ros_int_cnt = 0;
-static uint32_t ros_sys_ticks = 0;
 static ROS_TCB idle_tcb;
 static uint8_t idle_task_stack[ROS_IDLE_STACK_SIZE];
 // current running task
@@ -17,8 +16,10 @@ static ros_switch_context_shell(ROS_TCB *old_tcb, ROS_TCB *new_tcb);
 /**
  * @brief  Warpper function of context switch. It will be called by schduler,set
  * the current_tcb
- * @param  *old_tcb: tcb need to swap out, it always pointer to current_tcb
- * @param  *new_tcb: tcb need to swap in, current_tcb will be set to new_tcb
+ * @param  *old_tcb: tcb need to swap out, it always pointer to current_tcb,
+ * nullable
+ * @param  *new_tcb: tcb need to swap in, current_tcb will be set to new_tcb,
+ * nonull
  */
 static ros_switch_context_shell(ROS_TCB *old_tcb, ROS_TCB *new_tcb) {
   // diable self-preemption
@@ -105,14 +106,21 @@ void ros_schedule() {
       current_tcb->status == TASK_TERMINATED) {
     // task with any priority(0~255) can be swap in
     new_tcb = ros_tcb_dequeue(MIN_TASK_PRIORITY);
-    ros_switch_context_shell(current_tcb, new_tcb);
+    if (new_tcb) {
+      // Do not enqueue curren_tcb here, when the task is blocked, it is added
+      // to timer_queue, it will enqueue when the ticks due.
+      ros_switch_context_shell(current_tcb, new_tcb);
+    } else {
+      // but you can't block the idle task
+      if (current_tcb == &idle_tcb) current_tcb->status = TASK_READY;
+    }
   } else {
     // remove terminated task
-    // todo how about suspended task?
     do {
       new_tcb = ros_tcb_dequeue(current_tcb->priority);
     } while (new_tcb && new_tcb->status == TASK_TERMINATED);
     if (new_tcb) {
+      ros_tcb_enqueue(current_tcb);
       ros_switch_context_shell(current_tcb, new_tcb);
     }
   }
@@ -120,7 +128,8 @@ void ros_schedule() {
 }
 
 /**
- * @brief enqueue tcb to list order by priority. Do round-robin when priority is same.
+ * @brief enqueue tcb to list order by priority. Do round-robin when priority is
+ * same.
  * @param  *tcb: the tcb to insert
  */
 void ros_tcb_enqueue(ROS_TCB *tcb) {
@@ -150,11 +159,12 @@ void ros_tcb_enqueue(ROS_TCB *tcb) {
 }
 
 /**
- * @brief  dequeue a tcb to swap in, requeir its priority no lower than lowest_priority
- * Because the list ordered by priority, we just check the head, if the head is lower than lowest_priority,
- * return NULL.
- * use ros_tcb_dequeue(MIN_TASK_PRIORITY) to dequeue head unconditionally
- * @param lowest_priority: the lowest priority of dequeue tcb or NULL if no such tcb
+ * @brief  dequeue a tcb to swap in, requeir its priority no lower than
+ * lowest_priority Because the list ordered by priority, we just check the head,
+ * if the head is lower than lowest_priority, return NULL. use
+ * ros_tcb_dequeue(MIN_TASK_PRIORITY) to dequeue head unconditionally
+ * @param lowest_priority: the lowest priority of dequeue tcb or NULL if no such
+ * tcb
  */
 void ros_tcb_dequeue(uint8_t lowest_priority) {
   if (tcb_ready_list == NULL || tcb_ready_list->priority > lowest_priority) {
@@ -171,13 +181,5 @@ void ros_tcb_dequeue(uint8_t lowest_priority) {
 }
 
 void ros_int_enter() { ros_int_cnt++; }
-
-void ros_sys_tick() {
-  if (ROS_STARTED) {
-    ros_sys_ticks++;
-  } else {
-    // #warning "ROS not started, please call ros_init() first."
-  }
-}
 
 void ros_int_exit() { ros_int_cnt - ; }
