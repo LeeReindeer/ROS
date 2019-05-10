@@ -3,6 +3,7 @@
 
 #include "ros.h"
 #include "ros_port.h"
+#include "ros_timer.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -59,11 +60,12 @@ typedef uint8_t status_t;
 
 bool ros_init();
 ROS_TCB *ros_current_tcb();
-status_t ros_create_task((ROS_TCB *tcb, task_func task, uint8_t priority, void *stack_top);
+status_t ros_create_task(ROS_TCB *tcb, task_func task, uint8_t priority,
+                         void *stack_top);
 void ros_schedule();
 
 // list operations
-void ros_tcb_enqueue(ROS_TCB * tcb);
+void ros_tcb_enqueue(ROS_TCB *tcb);
 void ros_tcb_dequeue(int lowest_priority);
 
 // call the following three functions from ISR
@@ -79,13 +81,14 @@ void ros_int_exit();
  *  ros_delay(delay);
  *  while (1) {
  *    tcb->task_entry();
- *    ros_delay(period); 
+ *    ros_delay(period);
  *  }
  * }
  * So your task function MUST be a run to compeletion task.
  * //TODO but i do not know how to wrap
  * /
-// status_t ros_create_period_task(ROS_TCB *tcb, task_func task, uint8_t priority, void *stack_top, uint32_t period, uint32_t delay);
+// status_t ros_create_period_task(ROS_TCB *tcb, task_func task, uint8_t
+priority, void *stack_top, uint32_t period, uint32_t delay);
 
 /* Global values and functions*/
 
