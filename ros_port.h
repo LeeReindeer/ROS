@@ -1,15 +1,20 @@
 #ifndef __ROS_PORT_H__
 #define __ROS_PORT_H__
 
-#define ARDUINO 100  // todo remove, include arduino files when i'm coding...
+// Uncomment when use ros as an arduino library
+/*
 #if ARDUINO >= 100
 #include "Arduino.h"
 #else
 #include "WProgram.h"
 #endif  // ARDUINO
+*/
+
 /**
  * include with avr-libc for uintX_t and bool
  */
+#include <avr/sleep.h>
+#include <avr/io.h>
 #include <avr/interrupt.h>
 #include <stdbool.h>
 #include <stdint.h>
