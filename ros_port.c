@@ -2,7 +2,6 @@
 #define __LEERPORT_H__
 
 #include "ros_port.h"
-#include <avr/sleep.h>
 #include "ros.h"
 /*specific port file for Arduino Uno */
 
@@ -50,7 +49,8 @@ static void task_shell() {
 }
 
 void ros_task_context_init(ROS_TCB *tcb_ptr, task_func task_f,
-                           void *stack_top) {
+                           void *sp) {
+  uint8_t *stack_top = (uint8_t*)sp;
   // pc
   // the function pointer is uint16_t in avr
   *stack_top-- = (uint8_t)((uint16_t)task_shell & 0xFF);         // the LSB
