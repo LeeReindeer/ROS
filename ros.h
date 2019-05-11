@@ -66,7 +66,7 @@ void ros_schedule();
 
 // list operations
 void ros_tcb_enqueue(ROS_TCB *tcb);
-void ros_tcb_dequeue(int lowest_priority);
+ROS_TCB *ros_tcb_dequeue(uint8_t lowest_priority);
 
 // call the following three functions from ISR
 void ros_int_enter();

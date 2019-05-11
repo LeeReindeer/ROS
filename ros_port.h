@@ -13,10 +13,11 @@
 /**
  * include with avr-libc for uintX_t and bool
  */
-#include <avr/sleep.h>
-#include <avr/io.h>
 #include <avr/interrupt.h>
+#include <avr/io.h>
+#include <avr/sleep.h>
 #include <stdbool.h>
+#include <stddef.h>
 #include <stdint.h>
 
 #ifdef __cplusplus

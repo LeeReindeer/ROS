@@ -164,17 +164,17 @@ void ros_tcb_enqueue(ROS_TCB *tcb) {
     // same priority task will do round-bobin
     if ((next_ptr == NULL) || (next_ptr->priority > tcb->priority)) {
       // list is empty or insert to head
-      if (next_ptr == ready_list) {
-        ready_list = tcb;
-        tcb->next = next_ptr;  // next_ptr maybe NULL
-      } else {                 // insert between tow tcb or tail
-        tcb->next = next_ptr;  // next_ptr maybe NUL
-        prev_ptr->next = tcb;
+      if (next_ptr == tcb_ready_list) {
+        tcb_ready_list = tcb;
+        tcb->next_tcb = next_ptr;  // next_ptr maybe NULL
+      } else {                     // insert between tow tcb or tail
+        tcb->next_tcb = next_ptr;  // next_ptr maybe NUL
+        prev_ptr->next_tcb = tcb;
       }
       break;
     } else {
       prev_ptr = next_ptr;
-      next_ptr = next_ptr->next;
+      next_ptr = next_ptr->next_tcb;
     }
   } while (prev_ptr != NULL);
 }
@@ -187,15 +187,15 @@ void ros_tcb_enqueue(ROS_TCB *tcb) {
  * @param lowest_priority: the lowest priority of dequeue tcb or NULL if no such
  * tcb
  */
-void ros_tcb_dequeue(uint8_t lowest_priority) {
+ROS_TCB *ros_tcb_dequeue(uint8_t lowest_priority) {
   if (tcb_ready_list == NULL || tcb_ready_list->priority > lowest_priority) {
     return NULL;
   } else {
     ROS_TCB *tcb = tcb_ready_list;
-    tcb_ready_list = tcb_ready_list->next;
+    tcb_ready_list = tcb_ready_list->next_tcb;
     if (tcb_ready_list) {
       // make return tcb isolated
-      tcb->next = NULL;
+      tcb->next_tcb = NULL;
     }
     return tcb;
   }
@@ -203,4 +203,4 @@ void ros_tcb_dequeue(uint8_t lowest_priority) {
 
 void ros_int_enter() { ros_int_cnt++; }
 
-void ros_int_exit() { ros_int_cnt - ; }
+void ros_int_exit() { ros_int_cnt--; }

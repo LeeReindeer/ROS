@@ -30,7 +30,7 @@ void ros_check_timer() {
         // remove a mid or tail timer
         prev->next_timer = next->next_timer;
       }
-      //make this timer isolate
+      // make this timer isolate
       next->next_timer = NULL;
       if (wakeup_head == NULL) {
         cur_wakeup = wakeup_head = next;
@@ -38,7 +38,7 @@ void ros_check_timer() {
         cur_wakeup->next_timer = next;
         cur_wakeup = cur_wakeup->next_timer;
       }
-    } else  {
+    } else {
       // Use previous timer to remove timer
       prev = next;
     }
@@ -63,8 +63,7 @@ status_t ros_delay(uint32_t ticks) {
     status = ROS_ERR_PARAM;
   } else if (cur_tcb == NULL) {
     status = ROS_ERR_CONTEXT;
-  }
-  eles {
+  } else {
     CRITICAL_START();
     cur_tcb->status = TASK_BLOCKED;
     timer.ticks = ticks;
