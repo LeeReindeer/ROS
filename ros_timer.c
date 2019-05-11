@@ -15,7 +15,41 @@ static void wakeup_task(ROS_TCB *tcb) {
 
 // dec the ticks of every timer in timer_queue, wake up task if ticks == 0
 void ros_check_timer() {
-  // TODO
+  ROS_TIMER *prev, *next;
+  prev = next = timer_queue;
+  // timer list to wakeup
+  ROS_TIMER *wakeup_head = NULL, *cur_wakeup = NULL;
+  // Remove timer which's ticks = 0 from timer queue, and add to wakeup list
+  while (next) {
+    // use to update next
+    ROS_TIMER *saved_next = next->next_timer;
+    if ((--next->ticks) == 0) {
+      if (next == timer_queue) {
+        timer_queue = next->next_timer;
+      } else {
+        // remove a mid or tail timer
+        prev->next_timer = next->next_timer;
+      }
+      //make this timer isolate
+      next->next_timer = NULL;
+      if (wakeup_head == NULL) {
+        cur_wakeup = wakeup_head = next;
+      } else {
+        cur_wakeup->next_timer = next;
+        cur_wakeup = cur_wakeup->next_timer;
+      }
+    } else  {
+      // Use previous timer to remove timer
+      prev = next;
+    }
+    next = saved_next;
+  }
+
+  // walk through wakeup list
+  while (wakeup_head) {
+    wakeup_task(wakeup_head->blocked_tcb);
+    wakeup_head = wakeup_head->next_timer;
+  }
 }
 
 // delay current tcb
