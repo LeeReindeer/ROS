@@ -88,7 +88,7 @@ status_t ros_create_task(ROS_TCB *tcb, task_func task_f, uint8_t priority,
   tcb->status = TASK_READY;
   tcb->task_entry = task_f;
 
-  // Initial task context(pc, called-registers, SREG), and set current stack
+  // Initial task context(pc, calle-used registers), and set current stack
   // pointer to tcb
   ros_task_context_init(tcb, task_f, stack_top);
 

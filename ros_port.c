@@ -55,6 +55,7 @@ void ros_task_context_init(ROS_TCB *tcb_ptr, task_func task_f,
   // the function pointer is uint16_t in avr
   *stack_top-- = (uint8_t)((uint16_t)task_shell & 0xFF);         // the LSB
   *stack_top-- = (uint8_t)(((uint16_t)task_shell >> 8) & 0xFF);  // THE MSB
+  *stack_top-- = 0x00; // R0
   // Make space for R2-R17, R28-R29
   *stack_top-- = 0x00; // R2
   *stack_top-- = 0x00; // R3
@@ -92,11 +93,12 @@ void ros_task_context_init(ROS_TCB *tcb_ptr, task_func task_f,
  * 3. change the stack pointer to next task's stack pointer
  * 4. restore the next task's context (now we're at the new task' stask, pop to registers)
  * 
- * We just save and restore registers R2-R17, R28-R29, 
- * because whether context switch is called from ISR or
+ * We just save and restore registers R0, R2-R17, R28-R29,
+ * the SREG is saved by CRITICAL_START().
+ * Whether context switch is called from ISR or
  * task voluntarily yield() to the scheduler, 
  * the gcc compiler or the ISR will do save other registers.
- * https://gcc.gnu.org/wiki/avr-gcc#Call-Saved_Registers
+ * https://gcc.gnu.org/wiki/avr-gcc#Call-Used_Registers
  * 
  * @param  *old_tcb: the tcb will swap out
  * @param  *new_tcb: the tcb will swap in
@@ -104,6 +106,7 @@ void ros_task_context_init(ROS_TCB *tcb_ptr, task_func task_f,
 void ros_switch_context(ROS_TCB *old_tcb, ROS_TCB *new_tcb) {
   // The assembly code is in intel style, source is always on the right
   asm volatile(
+      "push r0\n\t"
       "push r2\n\t"
       "push r3\n\t"
       "push r4\n\t"
@@ -155,6 +158,7 @@ void ros_switch_context(ROS_TCB *old_tcb, ROS_TCB *new_tcb) {
       "pop r4\n\t"
       "pop r3\n\t"
       "pop r2\n\t"
+      "pop r0\n\t"
       "ret"
       "" ::
       [_SPL_] "i" _SFR_IO_ADDR(SPL),
