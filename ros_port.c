@@ -105,7 +105,7 @@ void ros_task_context_init(ROS_TCB *tcb_ptr, task_func task_f,
  */
 void ros_switch_context(ROS_TCB *old_tcb, ROS_TCB *new_tcb) {
   // The assembly code is in intel style, source is always on the right
-  asm volatile(
+  __asm__ __volatile__(
       "push r0\n\t"
       "push r2\n\t"
       "push r3\n\t"
@@ -127,7 +127,7 @@ void ros_switch_context(ROS_TCB *old_tcb, ROS_TCB *new_tcb) {
       "push r29\n\t"
       "mov r28, %A[_old_tcb_]\n\t" // move old tcb(LSB) to Y-regs
       "mov r29, %B[_old_tcb_]\n\t" // MSB
-      "sbiw r28:r29, 0\n\t"        // subract 0 from r29:r28, we need this to set SREG-Z if result is zero
+      "sbiw r28, 0\n\t"        // subract 0 from r29:r28, we need this to set SREG-Z if result is zero
       "breq restore\n\t"           // if old_tcb is NULL, jump to restore
       "in r16, %[_SPL_]\n\t"       // get stack pointer to r17:r16
       "in r17, %[_SPH_]\n\t"
@@ -159,7 +159,7 @@ void ros_switch_context(ROS_TCB *old_tcb, ROS_TCB *new_tcb) {
       "pop r3\n\t"
       "pop r2\n\t"
       "pop r0\n\t"
-      "ret"
+      "ret\n\t"
       "" ::
       [_SPL_] "i" _SFR_IO_ADDR(SPL),
       [_SPH_] "i" _SFR_IO_ADDR(SPH),
