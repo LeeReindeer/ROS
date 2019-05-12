@@ -1,20 +1,23 @@
 CC=avr-gcc
 OBJCOPY=avr-objcopy
 SIZE=avr-size
-DUDE=/home/leer/program/arduino-1.8.9/hardware/tools/avr/bin/avrdude
+DUDE=$(ARDUINO_DIR)/hardware/tools/avr/bin/avrdude
 
 MCU=atmega328p
 FCPU=16000000L
 
-CFLAGS= -g -Wall -Werror -Os -mmcu=$(MCU) -DF_CPU=$(FCPU) -DARDUINO=10809 -DARDUINO_AVR_UNO -DARDUINO_ARCH_AVR
-
-DUDE_CONF=/home/leer/program/arduino-1.8.9/hardware/tools/avr/etc/avrdude.conf
+ARDUINO_DIR=/home/leer/program/arduino-1.8.9
+DUDE_CONF=$(ARDUINO_DIR)/hardware/tools/avr/etc/avrdude.conf
 BUILD_DIR=build
+
+# Make target without arduino core lib
+# INCLUDES=-I$(ARDUINO_DIR)/hardware/arduino/avr/cores/arduino -I$(ARDUINO_DIR)/hardware/arduino/avr/variants/standard
+CFLAGS=$(INCLUDES) -g -Wall -Werror -Os -mmcu=$(MCU) -DF_CPU=$(FCPU) -DARDUINO=10809 -DARDUINO_AVR_UNO -DARDUINO_ARCH_AVR
 
 TARGET=ros
 SOURCE=$(wildcard *.c)
 # *.c -> build/*.o
-OBJS=$(addprefix $(BUILD_DIR)/,$(SOURCE:.c=.o)
+OBJS=$(addprefix $(BUILD_DIR)/,$(SOURCE:.c=.o))
 
 all: $(BUILD_DIR) $(BUILD_DIR)/$(TARGET).hex
 
