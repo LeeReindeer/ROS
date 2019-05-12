@@ -1,6 +1,3 @@
-#ifndef __LEERPORT_H__
-#define __LEERPORT_H__
-
 #include "ros_port.h"
 #include "ros.h"
 /*specific port file for Arduino Uno */
@@ -175,4 +172,3 @@ ISR(TIMER1_COMPA_vect) {
   // exit ISR, ready to call scheduler
   ros_int_exit();
 }
-#endif  //__LEERPORT_H__
