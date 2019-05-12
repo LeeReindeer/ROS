@@ -1,7 +1,6 @@
 #ifndef __ROS_H__
 #define __ROS_H__
 
-#include "ros.h"
 #include "ros_port.h"
 #include "ros_timer.h"
 
@@ -74,23 +73,7 @@ void ros_int_enter();
 extern void ros_sys_tick();
 void ros_int_exit();
 
-/**
- * Provide functions to schedule task periodly
- * We just wrap the task_func with ros_delay() in following format:
- * void task_wrapper() {
- *  ros_delay(delay);
- *  while (1) {
- *    tcb->task_entry();
- *    ros_delay(period);
- *  }
- * }
- * So your task function MUST be a run to compeletion task.
- * //TODO but i do not know how to wrap
- * /
-// status_t ros_create_period_task(ROS_TCB *tcb, task_func task, uint8_t
-priority, void *stack_top, uint32_t period, uint32_t delay);
-
-/* Global values and functions*/
+/* Global values and functions */
 
 extern bool ROS_STARTED;
 extern ROS_TCB *tcb_ready_list;

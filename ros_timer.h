@@ -1,11 +1,16 @@
 #ifndef __ROS_TIMER_H__
 #define __ROS_TIMER_H__
 
-#include "ros.h"
 
 #ifdef __cplusplus
 extern "C" {
 #endif
+
+#include "ros_port.h"
+
+// uncompleted define
+typedef struct ros_tcb ROS_TCB;
+typedef uint8_t status_t;
 
 typedef struct ros_timer {
   ROS_TCB *blocked_tcb;
@@ -20,7 +25,7 @@ status_t ros_delay(uint32_t ticks);
 void ros_set_sys_tick(uint32_t ticks);
 uint32_t ros_get_sys_tick();
 // transfer system tick to the time in the real world in 24-hours format
-void ros_set_time(uint8_t hour, uint8_t minute, uint8_t second);
+status_t ros_set_time(uint8_t hour, uint8_t minute, uint8_t second);
 char* ros_get_time();
 
 #ifdef __cplusplus

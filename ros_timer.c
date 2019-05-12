@@ -1,4 +1,5 @@
 #include "ros_timer.h"
+#include "ros.h"
 #include <stdio.h>
 
 static ROS_TIMER *timer_queue;
