@@ -3,15 +3,13 @@
 
 /*private fields and functions*/
 
-static uint8_t next_tcb_id = 0;
-
 static int ros_int_cnt = 0;
 static ROS_TCB idle_tcb;
 static uint8_t idle_task_stack[ROS_IDLE_STACK_SIZE];
 // current running task
 static ROS_TCB *current_tcb = NULL;
 
-static ros_switch_context_shell(ROS_TCB *old_tcb, ROS_TCB *new_tcb);
+static void ros_switch_context_shell(ROS_TCB *old_tcb, ROS_TCB *new_tcb);
 
 /*Global fields*/
 
@@ -33,7 +31,7 @@ ROS_TCB *tcb_ready_list = NULL;
  * @param  *new_tcb: tcb need to swap in, current_tcb will be set to new_tcb,
  * nonull
  */
-static ros_switch_context_shell(ROS_TCB *old_tcb, ROS_TCB *new_tcb) {
+static void ros_switch_context_shell(ROS_TCB *old_tcb, ROS_TCB *new_tcb) {
   // diable self-preemption
   if (old_tcb != new_tcb) {
     current_tcb = new_tcb;  // we don't need to update current_tcb in asm code
