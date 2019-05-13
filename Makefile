@@ -2,6 +2,7 @@ CC=avr-gcc
 OBJCOPY=avr-objcopy
 SIZE=avr-size
 DUDE=$(ARDUINO_DIR)/hardware/tools/avr/bin/avrdude
+SIMAVR=simavr
 
 MCU=atmega328p
 FCPU=16000000L
@@ -12,6 +13,8 @@ BUILD_DIR=build
 
 # Make target without arduino core lib
 # INCLUDES=-I$(ARDUINO_DIR)/hardware/arduino/avr/cores/arduino -I$(ARDUINO_DIR)/hardware/arduino/avr/variants/standard
+# Uncomment before execute make sim
+# INCLUDES=-Iinclude -I/usr/local/include/simavr -I /usr/local/include/simavr/avr
 CFLAGS=$(INCLUDES) -g -Wall -Werror -Os -mmcu=$(MCU) -DF_CPU=$(FCPU) -DARDUINO=10809 -DARDUINO_AVR_UNO -DARDUINO_ARCH_AVR
 
 TARGET=ros
@@ -41,6 +44,9 @@ $(BUILD_DIR)/$(TARGET).hex: $(BUILD_DIR)/$(TARGET).elf
 upload:
 	@echo Upload ROS to board...
 	$(DUDE) -C $(DUDE_CONF) -v -p $(MCU) -c arduino -P /dev/ttyACM0 -b 115200 -D -U flash:w:$(BUILD_DIR)/$(TARGET).hex:i 
+
+sim:
+	$(SIMAVR) -g $(BUILD_DIR)/$(TARGET).elf
 
 .PHONY: clean
 clean:

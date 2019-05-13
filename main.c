@@ -4,6 +4,9 @@
 #include <avr/io.h>
 #include "ros.h"
 
+// include for simavr
+// #include "avr_mcu_section.h"
+// AVR_MCU(F_CPU, "atmega328p");
 ROS_TCB task1;
 ROS_TCB task2;
 uint8_t task1_stack[ROS_DEFAULT_STACK_SIZE];
@@ -38,7 +41,7 @@ void t2() {
 }
 
 void setup() {
-  // set LED13 and LED 12 as output
+  // set LED 13 and LED 12 as output
   bitSet(DDRB, 5);
   bitSet(DDRB, 4);
   bool os_started = ros_init();
