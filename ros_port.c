@@ -45,9 +45,8 @@ static void task_shell() {
   ros_schedule();
 }
 
-void ros_task_context_init(ROS_TCB *tcb_ptr, task_func task_f,
-                           void *sp) {
-  uint8_t *stack_top = (uint8_t*)sp;
+void ros_task_context_init(ROS_TCB *tcb_ptr, task_func task_f, void *sp) {
+  uint8_t *stack_top = (uint8_t *)sp;
   // pc
   // the function pointer is uint16_t in avr
   *stack_top-- = (uint8_t)((uint16_t)task_shell & 0xFF);         // the LSB
@@ -72,11 +71,8 @@ void ros_task_context_init(ROS_TCB *tcb_ptr, task_func task_f,
   *stack_top-- = 0x00; // R17
   *stack_top-- = 0x00; // R28
   *stack_top-- = 0x00; // R29
-  // save the SREG contents to save the interrupt flag
-  // *stack_top-- = 0x80;  // sreg, enable interrupt
   tcb_ptr->sp = stack_top;
 }
-
 
 /**
  * Specific context switch routine for avr.
@@ -102,6 +98,7 @@ void ros_task_context_init(ROS_TCB *tcb_ptr, task_func task_f,
  */
 void ros_switch_context(ROS_TCB *old_tcb, ROS_TCB *new_tcb) {
   // The assembly code is in intel style, source is always on the right
+  // Y-reg is R28 and R29
   __asm__ __volatile__(
       "push r0\n\t"
       "push r2\n\t"
@@ -122,6 +119,7 @@ void ros_switch_context(ROS_TCB *old_tcb, ROS_TCB *new_tcb) {
       "push r17\n\t"
       "push r28\n\t"
       "push r29\n\t"
+      // r16, r17, r28 and r29 is saved, we're safe to use them
       "mov r28, %A[_old_tcb_]\n\t" // move old tcb(LSB) to Y-regs
       "mov r29, %B[_old_tcb_]\n\t" // MSB
       "sbiw r28, 0\n\t"        // subract 0 from r29:r28, we need this to set SREG-Z if result is zero
@@ -133,8 +131,8 @@ void ros_switch_context(ROS_TCB *old_tcb, ROS_TCB *new_tcb) {
       "restore:"
       "mov r28, %A[_new_tcb_]\n\t"
       "mov r29, %B[_new_tcb_]\n\t"
-      "ld r28, Y\n\t"              //load new_tcb->sp to r17:r16
-      "ldd r29, Y+1\n\t"
+      "ld r16, Y\n\t"              //load new_tcb->sp to r17:r16
+      "ldd r17, Y+1\n\t"
       "out %[_SPL_], r16\n\t"      //change the stack pointer to new_tcb->sp
       "out %[_SPH_], r17\n\t"
       "pop r29\n\t"                // restore new_tcb's context
