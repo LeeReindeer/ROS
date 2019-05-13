@@ -1,0 +1,10 @@
+{
+  "C_Cpp.clang_format_style": "{ BasedOnStyle: Google, IndentWidth: 2 }",
+  "C_Cpp.default.includePath": [
+    "/home/leer/program/arduino-1.8.9/hardware/tools/avr/avr/include/",
+    "/home/leer/program/arduino-1.8.9/hardware/arduino/avr/cores/arduino/",
+    "/home/leer/program/arduino-1.8.9/hardware/tools/avr/lib/gcc/avr/5.4.0/include"
+  ],
+  "editor.formatOnPaste": true,
+  "editor.formatOnSave": false
+}
