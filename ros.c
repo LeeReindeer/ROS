@@ -201,4 +201,7 @@ ROS_TCB *ros_tcb_dequeue(uint8_t lowest_priority) {
 
 void ros_int_enter() { ros_int_cnt++; }
 
-void ros_int_exit() { ros_int_cnt--; }
+void ros_int_exit() { 
+  ros_int_cnt--;
+  ros_schedule();
+}
