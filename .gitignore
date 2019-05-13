@@ -1,0 +1,5 @@
+.vscode/ipch/
+*.out
+*.hex
+*.o
+test/
