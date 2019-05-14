@@ -45,6 +45,7 @@ extern "C" {
 
 #define ROS_IDLE_STACK_SIZE 64
 #define ROS_DEFAULT_STACK_SIZE 128
+#define ROS_MIN_STACK_SIZE 32
 
 #ifdef __cplusplus
 }
