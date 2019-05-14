@@ -38,10 +38,10 @@ static void task_shell() {
 
   if (cur_tcb && cur_tcb->task_entry) {
     cur_tcb->task_entry();
+    // when the task terminated(task return), remove it from ready list and
+    cur_tcb->status = TASK_TERMINATED;
   }
-  // when the task terminated(task return), remove it from ready list and
   // re-schedule
-  cur_tcb->status = TASK_TERMINATED;
   ros_schedule();
 }
 
