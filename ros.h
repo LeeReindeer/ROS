@@ -40,6 +40,7 @@ typedef struct ros_tcb {
   struct ros_tcb *next_tcb;
 } ROS_TCB;
 
+typedef uint8_t stack_t;
 #define STACK_POINT(A, SIZE) (&A[SIZE - 1])
 
 // #define TRUE 1
@@ -60,7 +61,7 @@ typedef uint8_t status_t;
 bool ros_init();
 ROS_TCB *ros_current_tcb();
 status_t ros_create_task(ROS_TCB *tcb, task_func task, uint8_t priority,
-                         void *stack_top);
+                         stack_t *stack, int stack_size);
 void ros_schedule();
 
 // list operations

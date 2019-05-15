@@ -51,8 +51,7 @@ bool ros_init() {
   CRITICAL_START();
   ros_init_timer();
   status_t ok =
-      ros_create_task(&idle_tcb, ros_idle_task, MIN_TASK_PRIORITY,
-                      STACK_POINT(idle_task_stack, ROS_IDLE_STACK_SIZE));
+      ros_create_task(&idle_tcb, ros_idle_task, MIN_TASK_PRIORITY, idle_task_stack, ROS_IDLE_STACK_SIZE);
   ROS_STARTED = ok == ROS_OK;
   CRITICAL_END();
   return ROS_STARTED;
@@ -76,11 +75,12 @@ ROS_TCB *ros_current_tcb() {
  * @retval ROS_ERR_PARAM Bad param
  */
 status_t ros_create_task(ROS_TCB *tcb, task_func task_f, uint8_t priority,
-                         void *stack_top) {
+                         stack_t *stack, int stack_size) {
   CRITICAL_STORE;
-  if (tcb == NULL || task_f == NULL || stack_top == NULL) {
+  if (tcb == NULL || task_f == NULL || stack == NULL || stack_size < ROS_MIN_STACK_SIZE) {
     return ROS_ERR_PARAM;
   }
+  void *stack_top = STACK_POINT(stack, stack_size);
   tcb->priority = priority;
   tcb->next_tcb = NULL;
   tcb->status = TASK_READY;

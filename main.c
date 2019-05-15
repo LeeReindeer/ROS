@@ -46,10 +46,8 @@ void setup() {
   bitSet(DDRB, 4);
   bool os_started = ros_init();
   if (os_started) {
-    ros_create_task(&task1, t1, TASK1_PRIORITY,
-                    STACK_POINT(task1_stack, ROS_DEFAULT_STACK_SIZE));
-    ros_create_task(&task2, t2, TASK2_PRIORITY,
-                    STACK_POINT(task2_stack, ROS_DEFAULT_STACK_SIZE));
+    ros_create_task(&task1, t1, TASK1_PRIORITY, task1_stack, ROS_DEFAULT_STACK_SIZE);
+    ros_create_task(&task2, t2, TASK2_PRIORITY, task2_stack, ROS_DEFAULT_STACK_SIZE);
     ros_schedule();
   }
 }
