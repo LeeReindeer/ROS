@@ -1,5 +1,9 @@
 # ROS
 
+![](https://img.shields.io/badge/language-C-green.svg)
+![](https://img.shields.io/badge/category-learning-blue.svg)
+[![](https://img.shields.io/badge/blog-@LeeReindeer-red.svg)](https://leer.moe)
+
 ![LOGO](art/ros-logo.webp)
 
 > ROS -> LEERTOS -> LEER'S RTOS
