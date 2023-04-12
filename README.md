@@ -16,7 +16,7 @@ RTOS implementation, a task scheduler run on atmega328p. Get more information on
 
 To manually build ROS, the following avr and Arduino tool chains are utilized: avr-gcc, avr-size, avr-objcopy, and avrdude. The correct paths of these tool chains should be properly configured within the Makefile.
 
-The default target "all" will build $(BUILD_DIR)/$(TARGET).hex, which depends on $(BUILD_DIR)/$(TARGET).elf, which in turn depends on OBJS. Therefore, the final build order is:  OBJS -> $(BUILD_DIR)/$(TARGET).elf -> $(BUILD_DIR)/$(TARGET).hex  The "Upload" target will use the avrdude tool to upload the built hex file to the AVR development board, in this case the Arduino Uno with atmega328p. The MCU variable can also be customized to build and upload for different development boards.
+The default target "all" will build `$(BUILD_DIR)/$(TARGET).hex`, which depends on `$(BUILD_DIR)/$(TARGET).elf`, which in turn depends on `OBJS`. Therefore, the final build order is:  `OBJS` -> `$(BUILD_DIR)/$(TARGET).elf` -> `$(BUILD_DIR)/$(TARGET).hex`  The "Upload" target will use the avrdude tool to upload the built hex file to the AVR development board, in this case the Arduino Uno with atmega328p. The MCU variable can also be customized to build and upload for different development boards.
 
 Then you can simply execute the command `make all` to both build and upload the code.
 
